@@ -14,7 +14,7 @@ def last_month():
 def today():
     return now().replace(microsecond=0,second=0,minute=0,hour=start_of_day)
 def timestamp_to_date(timestamp):
-    return datetime.fromtimestamp(float(timestamp), JST)-timedelta(hours=start_of_day)
+    return datetime.fromtimestamp(float(timestamp), JST)
 
 class Slack:
     def __init__(self):
@@ -65,7 +65,7 @@ def streak_to_msg(streak):
         str = "".join(("O" if day > 0 else ".") for day in days)
         usr = user.ljust(user_len)
         msg += f"{usr} : {str}\n"
-    return f"```{msg}```"
+    return f"```\n{msg}```"
 
 slack = Slack()
 channel = os.environ['CHANNEL']
@@ -86,8 +86,7 @@ def tests():
     print(streak_to_msg(test_streak))
 
 def main():
-    week_post()
-    if now().weekday == 0:
+    if now().weekday() == 0:
         week_post()
     if now().day == 1:
         month_post()
@@ -97,14 +96,14 @@ def week_post():
     streak = message_streak(messages, last_week(), today())
     msg = streak_to_msg(streak)
     print(msg)
-    slack.send(channel, "先週\n"+msg)
+    slack.send(channel, "先週のトレーニング\n"+msg)
 
 def month_post():
     messages = slack.read(channel, last_month())
     streak = message_streak(messages, last_month(), today())
     msg = streak_to_msg(streak)
     print(msg)
-    slack.send(channel, "先月\n"+msg)
+    slack.send(channel, "先月のトレーニング\n"+msg)
 
 import base64
 def slack_training_streak(event, context):
